@@ -1,4 +1,3 @@
-name: mongo-sharding
 version: '3'
 services:
 
