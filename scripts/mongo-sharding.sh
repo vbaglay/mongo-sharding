@@ -1,6 +1,8 @@
-1. docker-compose -p mongo-sharding up -d
+#!/bin/bash
 
-2. docker exec -it configSrv mongosh --port 27017
+docker-compose -p mongo-sharding up
+
+docker exec -it configSrv mongosh --port 27017 <<EOF
  rs.initiate(
   {
     _id : "config_server",
@@ -11,9 +13,9 @@
   }
 );
  exit();
+EOF
 
-
-3. docker exec -it shard1 mongosh --port 27018
+docker exec -it shard1 mongosh --port 27018 <<EOF
 
  rs.initiate(
     {
@@ -25,9 +27,9 @@
     }
 );
  exit();
+EOF
 
-
-4. docker exec -it shard2 mongosh --port 27019 
+docker exec -it shard2 mongosh --port 27019 <<EOF
 
  rs.initiate(
     {
@@ -39,9 +41,9 @@
     }
   );
  exit();
+EOF
 
-
-5. docker exec -it mongos_router mongosh --port 27020 
+docker exec -it mongos_router mongosh --port 27020 <<EOF
 
  sh.addShard( "shard1/shard1:27018");
  sh.addShard( "shard2/shard2:27019");
@@ -55,16 +57,17 @@
 
  db.helloDoc.countDocuments() 
  exit();
+EOF
 
-
-6. docker exec -it shard1 mongosh --port 27018 
+ docker exec -it shard1 mongosh --port 27018 <<EOF
 use somedb;
 db.helloDoc.countDocuments();
 exit();
 
+EOF
 
-
-7. docker exec -it shard2 mongosh --port 27019 
+docker exec -it shard2 mongosh --port 27019 <<EOF
 use somedb;
 db.helloDoc.countDocuments();
 exit();
+EOF
